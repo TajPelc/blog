@@ -422,29 +422,31 @@ Full access granted.
                 drawFood();
             }
 
-            function startGame() {
-                placeFood();
-                clearCanvas();
-                drawSnake();
-                drawFood();
+function startGame() {
+    let countdownInterval;  // Initialize countdownInterval here
 
-                let startCountdown = 5;
-                const startTimer = setInterval(() => {
-                    gameInfo.textContent = `Starting in: ${startCountdown}`;
-                    startCountdown--;
-                    if (startCountdown < 0) {
-                        clearInterval(startTimer);
-                        gameLoop = setInterval(updateGame, 100);
-                        countdownInterval = setInterval(() => {
-                            gameTime--;
-                            gameInfo.textContent = `Time remaining: ${gameTime}s`;
-                            if (gameTime <= 0) {
-                                endGame(false);
-                            }
-                        }, 1000);
-                    }
-                }, 1000);
-            }
+    placeFood();
+    clearCanvas();
+    drawSnake();
+    drawFood();
+
+    let startCountdown = 5;
+    const startTimer = setInterval(() => {
+        gameInfo.textContent = `Starting in: ${startCountdown}`;
+        startCountdown--;
+        if (startCountdown < 0) {
+            clearInterval(startTimer);
+            gameLoop = setInterval(updateGame, 100);
+            countdownInterval = setInterval(() => {  // Now countdownInterval is defined
+                gameTime--;
+                gameInfo.textContent = `Time remaining: ${gameTime}s`;
+                if (gameTime <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+    }, 1000);
+}
 
             startGame();
 

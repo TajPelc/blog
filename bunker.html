@@ -116,6 +116,29 @@
             right: 10px;
             font-size: 0.8em;
         }
+        #game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #retry-button {
+            background-color: #ffff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
         @media (max-width: 600px) {
             #terminal {
                 font-size: 14px;
@@ -252,6 +275,7 @@ Good luck, agent.
             initializeGame();
         });
 
+ 
         function initializeGame() {
             const gameContainer = document.createElement('div');
             gameContainer.id = 'game-container';
@@ -348,8 +372,8 @@ Good luck, agent.
             function endGame(success) {
                 clearInterval(gameLoop);
                 clearInterval(countdownInterval);
-                gameContainer.style.display = 'none';
                 if (success) {
+                    gameContainer.style.display = 'none';
                     terminal.innerHTML = headerText + `
 Hack successful.
 
@@ -363,10 +387,27 @@ Full access granted.
     <a href="https://daily.pelc.cc/" target="_blank" class="final-btn">Daily Newsletter</a>
 </div>`;
                 } else {
-                    terminal.innerHTML += "\nHack unsuccessful. Try again.\n";
-                    terminal.appendChild(hackButton);
-                    hackButton.style.display = 'block';
+                    const overlay = document.createElement('div');
+                    overlay.id = 'game-overlay';
+                    overlay.innerHTML = `
+                        <div>Hack failed.</div>
+                        <button id="retry-button">[RETRY]</button>
+                    `;
+                    gameContainer.appendChild(overlay);
+                    document.getElementById('retry-button').addEventListener('click', () => {
+                        gameContainer.removeChild(overlay);
+                        resetGame();
+                    });
                 }
+            }
+
+            function resetGame() {
+                snake = [{x: 150, y: 100}, {x: 140, y: 100}, {x: 130, y: 100}];
+                dx = 10;
+                dy = 0;
+                gameTime = 30;
+                placeFood();
+                startGame();
             }
 
             function updateGame() {
@@ -386,43 +427,55 @@ Full access granted.
                 drawFood();
             }
 
-            placeFood();
-            clearCanvas();
-            drawSnake();
-            drawFood();
+            function startGame() {
+                placeFood();
+                clearCanvas();
+                drawSnake();
+                drawFood();
 
-            let startCountdown = 5;
-            const startTimer = setInterval(() => {
-                gameInfo.textContent = `Starting in: ${startCountdown}`;
-                startCountdown--;
-                if (startCountdown < 0) {
-                    clearInterval(startTimer);
-                    gameLoop = setInterval(updateGame, 100);
-                    countdownInterval = setInterval(() => {
-                        gameTime--;
-                        gameInfo.textContent = `Time remaining: ${gameTime}s`;
-                        if (gameTime <= 0) {
-                            endGame(false);
-                        }
-                    }, 1000);
+                let startCountdown = 5;
+                const startTimer = setInterval(() => {
+                    gameInfo.textContent = `Starting in: ${startCountdown}`;
+                    startCountdown--;
+                    if (startCountdown < 0) {
+                        clearInterval(startTimer);
+                        gameLoop = setInterval(updateGame, 100);
+                        countdownInterval = setInterval(() => {
+                            gameTime--;
+                            gameInfo.textContent = `Time remaining: ${gameTime}s`;
+                            if (gameTime <= 0) {
+                                endGame(false);
+                            }
+                        }, 1000);
+                    }
+                }, 1000);
+            }
+
+            startGame();
+
+            function changeDirection(newDx, newDy) {
+                if ((newDx === 10 && dx === -10) || (newDx === -10 && dx === 10) ||
+                    (newDy === 10 && dy === -10) || (newDy === -10 && dy === 10)) {
+                    return;  // Prevent 180-degree turns
                 }
-            }, 1000);
+                dx = newDx;
+                dy = newDy;
+            }
 
-            document.getElementById('up').addEventListener('click', () => { dx = 0; dy = -10; });
-            document.getElementById('down').addEventListener('click', () => { dx = 0; dy = 10; });
-            document.getElementById('left').addEventListener('click', () => { dx = -10; dy = 0; });
-            document.getElementById('right').addEventListener('click', () => { dx = 10; dy = 0; });
+            document.getElementById('up').addEventListener('click', () => changeDirection(0, -10));
+            document.getElementById('down').addEventListener('click', () => changeDirection(0, 10));
+            document.getElementById('left').addEventListener('click', () => changeDirection(-10, 0));
+            document.getElementById('right').addEventListener('click', () => changeDirection(10, 0));
 
             // Keyboard controls
             document.addEventListener('keydown', (e) => {
                 switch(e.key) {
-                    case 'ArrowUp': dx = 0; dy = -10; break;
-                    case 'ArrowDown': dx = 0; dy = 10; break;
-                    case 'ArrowLeft': dx = -10; dy = 0; break;
-                    case 'ArrowRight': dx = 10; dy = 0; break;
+                    case 'ArrowUp': changeDirection(0, -10); break;
+                    case 'ArrowDown': changeDirection(0, 10); break;
+                    case 'ArrowLeft': changeDirection(-10, 0); break;
+                    case 'ArrowRight': changeDirection(10, 0); break;
                 }
             });
-        }
     </script>
 </body>
 </html>

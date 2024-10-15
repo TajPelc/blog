@@ -216,7 +216,12 @@ Mission Objective: Engage target for intelligence gathering at the networking ev
 To access full profile, complete the following security check.`;
 
         const gameInstructions = `
-HACKING GAME INSTRUCTIONS: Collect the red data packet. Avoid colliding with the firewall edge.
+HACKING GAME INSTRUCTIONS:
+
+1. Navigate the snake through the firewall.
+2. Collect the red data packets to bypass security.
+3. Avoid colliding with the firewall edges.
+4. Complete the hack within the time limit.
 
 Use arrow keys or on-screen buttons to control the snake.
 Press the "Hack" button when ready to begin.
@@ -422,31 +427,29 @@ Full access granted.
                 drawFood();
             }
 
-function startGame() {
-    let countdownInterval;  // Initialize countdownInterval here
+            function startGame() {
+                placeFood();
+                clearCanvas();
+                drawSnake();
+                drawFood();
 
-    placeFood();
-    clearCanvas();
-    drawSnake();
-    drawFood();
-
-    let startCountdown = 5;
-    const startTimer = setInterval(() => {
-        gameInfo.textContent = `Starting in: ${startCountdown}`;
-        startCountdown--;
-        if (startCountdown < 0) {
-            clearInterval(startTimer);
-            gameLoop = setInterval(updateGame, 100);
-            countdownInterval = setInterval(() => {  // Now countdownInterval is defined
-                gameTime--;
-                gameInfo.textContent = `Time remaining: ${gameTime}s`;
-                if (gameTime <= 0) {
-                    endGame(false);
-                }
-            }, 1000);
-        }
-    }, 1000);
-}
+                let startCountdown = 5;
+                const startTimer = setInterval(() => {
+                    gameInfo.textContent = `Starting in: ${startCountdown}`;
+                    startCountdown--;
+                    if (startCountdown < 0) {
+                        clearInterval(startTimer);
+                        gameLoop = setInterval(updateGame, 100);
+                        countdownInterval = setInterval(() => {
+                            gameTime--;
+                            gameInfo.textContent = `Time remaining: ${gameTime}s`;
+                            if (gameTime <= 0) {
+                                endGame(false);
+                            }
+                        }, 1000);
+                    }
+                }, 1000);
+            }
 
             startGame();
 

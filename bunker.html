@@ -40,6 +40,9 @@
         }
         #game-container {
             margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
         #game-canvas {
             display: block;
@@ -72,7 +75,7 @@
             grid-template-rows: repeat(3, auto);
             gap: 5px;
             margin-top: 10px;
-            justify-content: center;
+            justify-content: start;
         }
         .control-btn {
             background-color: #ffff00;
@@ -185,7 +188,7 @@ Skills Profile:
 
 Note: Target's expertise in these areas makes them a high-value asset for technological operations and potential recruitment.
 
-Mission Objective: Engage target for intelligence gathering at the upcoming networking event. Approach with caution. Target's language skills and technical expertise may be utilized for various international connections and operations.
+Mission Objective: Engage target for intelligence gathering at the networking event. Approach with caution.
 
 To access full profile, complete the following security check.`;
 
@@ -247,10 +250,6 @@ Good luck, agent.
         hackButton.addEventListener('click', () => {
             hackButton.style.display = 'none';
             initializeGame();
-            // Scroll to the bottom of the page after a short delay
-            setTimeout(() => {
-                window.scrollTo(0, document.body.scrollHeight);
-            }, 100);
         });
 
         function initializeGame() {
@@ -288,6 +287,14 @@ Good luck, agent.
             gameContainer.appendChild(gameControls);
 
             terminal.appendChild(gameContainer);
+
+            // Scroll to the bottom of the page after a short delay to ensure all elements are rendered
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
 
             const ctx = canvas.getContext('2d');
 

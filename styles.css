@@ -25,27 +25,9 @@ html {
 }
 
 #content {
-    text-align: justify;
+    text-align: left;
     max-width: 800px;
     margin: 0 auto;
-}
-
-#cursor {
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0% {
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
 }
 
 #game-container {
@@ -53,60 +35,53 @@ html {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 600px;
+    max-width: 90vw;
     margin: 0 auto;
 }
 
 #game-canvas {
-    margin-top: 20px;
-    border: 4px solid #ffff00;
     width: 100%;
     height: auto;
-    max-width: 600px;
-    max-height: 400px;
+    max-height: 70vh;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    border: 2px solid #ffff00;
 }
 
 #game-controls {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(3, auto);
     gap: 10px;
     margin-top: 20px;
     justify-content: center;
-    max-width: 300px;
-    width: 100%;
 }
 
 .control-btn {
     background-color: #ffff00;
     color: #000;
     border: none;
-    width: 100%;
-    aspect-ratio: 1;
+    width: 60px;
+    height: 60px;
     font-family: inherit;
     font-size: 2em;
     cursor: pointer;
-}
-
-#crt-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 255, 0, 0.06), rgba(255, 255, 0, 0.02), rgba(255, 255, 0, 0.06));
-    background-size: 100% 2px, 3px 100%;
-    pointer-events: none;
-    z-index: 1000;
-}
-
-#buttons-container {
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+}
+
+#up { grid-area: 1 / 2 / 2 / 3; }
+#left { grid-area: 2 / 1 / 3 / 2; }
+#right { grid-area: 2 / 3 / 3 / 4; }
+#down { grid-area: 3 / 2 / 4 / 3; }
+
+#cpu-meter {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2em;
+    z-index: 1001;
 }
 
 .mission-button {
@@ -120,86 +95,32 @@ html {
     margin-top: 20px;
 }
 
-#game-controls {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-rows: repeat(3, auto);
-    gap: 10px;
-    margin-top: 20px;
-    justify-content: center;
-}
-
-
-#up {
-    grid-area: 1 / 2 / 2 / 3;
-}
-
-#left {
-    grid-area: 2 / 1 / 3 / 2;
-}
-
-#right {
-    grid-area: 2 / 3 / 3 / 4;
-}
-
-#down {
-    grid-area: 3 / 2 / 4 / 3;
-}
-
-#cpu-meter {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    font-size: 1.2em;
-    z-index: 1001;
-}
-
-#final-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.final-btn {
-    background-color: #ffff00;
-    color: #000;
-    border: none;
-    padding: 15px 30px;
-    font-family: inherit;
-    font-size: 1.2em;
-    cursor: pointer;
-    text-decoration: none;
-}
-
 @media (max-width: 600px) {
     #terminal {
         font-size: 24px;
         padding: 15px;
     }
 
-    #game-canvas {
-        width: 100%;
-        height: auto;
-      }
+    #game-container {
+        max-width: 95vw;
+    }
 
     .control-btn {
-        font-size: 2em;
+        width: 50px;
+        height: 50px;
+        font-size: 1.8em;
     }
 
-
-    .mission-button,
-    .final-btn {
-        padding: 15px 30px;
-        font-size: 1.2em;
+    #cpu-meter {
+        font-size: 1.1em;
     }
 
-    #final-buttons {
-        flex-direction: column;
-        align-items: stretch;
+    .mission-button {
+        font-size: 1.1em;
+        padding: 12px 24px;
     }
 }
+
 
 @font-face {
     font-family: 'VT323';

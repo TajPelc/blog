@@ -5,7 +5,7 @@ const buttonsContainer = document.getElementById('buttons-container');
 const cpuMeter = document.getElementById('cpu-meter');
 
 // Typing speed control (lower value = faster typing)
-const typingSpeed = 0; // Adjust this value to change typing speed
+const typingSpeed = 75; // Adjust this value to change typing speed
 
 const headerText = `
 BRNO BUNKER OPERATING SYSTEM

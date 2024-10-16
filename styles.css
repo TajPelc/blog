@@ -53,17 +53,42 @@ html {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 90vw;
+    max-width: 600px;
     margin: 0 auto;
-  }
+}
 
-  #game-canvas {
+#game-canvas {
+    margin-top: 20px;
+    border: 4px solid #ffff00;
     width: 100%;
     height: auto;
-    max-height: 70vh;
+    max-width: 600px;
+    max-height: 400px;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-  }
+}
+
+#game-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+    max-width: 300px;
+    width: 100%;
+}
+
+.control-btn {
+    background-color: #ffff00;
+    color: #000;
+    border: none;
+    width: 100%;
+    aspect-ratio: 1;
+    font-family: inherit;
+    font-size: 2em;
+    cursor: pointer;
+}
 
 #crt-overlay {
     position: fixed;
@@ -104,16 +129,6 @@ html {
     justify-content: center;
 }
 
-.control-btn {
-    background-color: #ffff00;
-    color: #000;
-    border: none;
-    width: 70px;
-    height: 70px;
-    font-family: inherit;
-    font-size: 2em;
-    cursor: pointer;
-}
 
 #up {
     grid-area: 1 / 2 / 2 / 3;
@@ -167,18 +182,17 @@ html {
     #game-canvas {
         width: 100%;
         height: auto;
-    }
+      }
 
     .control-btn {
-        width: 80px;
-        height: 80px;
-        font-size: 2.5em;
+        font-size: 2em;
     }
+
 
     .mission-button,
     .final-btn {
-        padding: 20px 40px;
-        font-size: 1.4em;
+        padding: 15px 30px;
+        font-size: 1.2em;
     }
 
     #final-buttons {

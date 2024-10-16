@@ -365,21 +365,22 @@ let CANVAS_HEIGHT = 200;
 function initializeGame() {
     startTyping(gameInstructions, () => {
         hackButton.style.display = 'block';
+        hackButton.className = 'mission-button';
     });
 }
-
 function setupCanvas() {
     const containerWidth = document.getElementById('game-container').clientWidth;
     const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
     
     if (screenWidth < 600) {
-        // On mobile, make the canvas fill the width of the screen
-        CANVAS_WIDTH = containerWidth;
-        CANVAS_HEIGHT = containerWidth * (2/3); // Maintain 3:2 aspect ratio
+        // On mobile, make the canvas fill 90% of the screen width
+        CANVAS_WIDTH = Math.min(containerWidth, screenWidth * 0.9);
+        CANVAS_HEIGHT = CANVAS_WIDTH * (2/3); // Maintain 3:2 aspect ratio
     } else {
         // On desktop, keep original size
         CANVAS_WIDTH = 600;
-        CANVAS_HEIGHT = 300;
+        CANVAS_HEIGHT = 400;
     }
 
     canvasScale = window.devicePixelRatio || 1;
@@ -394,6 +395,8 @@ function setupCanvas() {
     // Adjust grid size based on new canvas dimensions
     GRID_SIZE = Math.floor(CANVAS_WIDTH / 30); // Adjust this value as needed
 }
+
+
 function startGame() {
     initAudio();
     ensureAudioContext();
@@ -1122,6 +1125,7 @@ function setupControls() {
 document.addEventListener('DOMContentLoaded', () => {
     startTyping(headerText + missionText, () => {
         acceptMissionBtn.style.display = 'block';
+        acceptMissionBtn.className = 'mission-button';
     });
 
     acceptMissionBtn.addEventListener('click', () => {
@@ -1135,6 +1139,8 @@ document.addEventListener('DOMContentLoaded', () => {
         initAudio();
         startGame();
     });
+
+    setupCanvas()
 });
 
 window.addEventListener('resize', () => {

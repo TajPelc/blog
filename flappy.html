@@ -3,18 +3,9 @@
   <head>
     <title>Flappy Bird</title>
     <script src="https://telegram.org/js/games.js"></script>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <!-- Previous styles remain the same -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       #game {
         position: relative;
         width: 100vw;
@@ -24,7 +15,6 @@
         cursor: pointer;
         touch-action: none;
       }
-
       #bird {
         position: absolute;
         width: min(30px, 8vmin);
@@ -34,12 +24,7 @@
         transform: translateY(-50%);
         z-index: 1;
       }
-
-      .pipe {
-        position: absolute;
-        height: 100%;
-      }
-
+      .pipe { position: absolute; height: 100%; }
       #score {
         position: absolute;
         top: min(20px, 5vh);
@@ -51,7 +36,6 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         z-index: 1000;
       }
-
       #gameOver {
         position: absolute;
         top: 50%;
@@ -66,24 +50,14 @@
         z-index: 1000;
         display: none;
       }
-
-      #gameOver h2 {
-        margin: 0;
-        font-size: min(24px, 6vmin);
-      }
-
-      #gameOver p {
-        margin: min(10px, 2vmin) 0;
-        font-size: min(18px, 4vmin);
-      }
-
+      #gameOver h2 { font-size: min(24px, 6vmin); }
+      #gameOver p { margin: min(10px, 2vmin) 0; font-size: min(18px, 4vmin); }
       .button-container {
         display: flex;
         gap: 10px;
         justify-content: center;
         margin-top: 15px;
       }
-
       .game-button {
         padding: min(10px, 2vmin) min(20px, 4vmin);
         font-size: min(16px, 4vmin);
@@ -91,68 +65,17 @@
         border: none;
         border-radius: 5px;
         min-width: 120px;
-      }
-
-      #retryButton {
-        background: #4CAF50;
         color: white;
       }
-
-      #endGameButton {
-        background: #f44336;
-        color: white;
-      }
-
-      #version {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        font-family: Arial;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.7);
-        z-index: 1000;
-      }
-
-      #debug {
-        position: fixed;
-        top: 0;
-        left: 0;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 5px;
-        font-family: monospace;
-        font-size: 10px;
-        max-width: 100%;
-        max-height: 50%;
-        overflow-y: auto;
-        z-index: 2000;
-        display: none;
-      }
+      #retryButton { background: #4CAF50; }
+      #endGameButton { background: #f44336; }
     </style>
   </head>
   <body>
     <div id="game">
       <div id="bird">
-        <div
-          style="
-            width: 100%;
-            height: 100%;
-            background: #ffd700;
-            border-radius: 50%;
-            position: relative;
-          "
-        >
-          <div
-            style="
-              position: absolute;
-              width: 33%;
-              height: 20%;
-              background: #ffa500;
-              right: -7%;
-              top: 40%;
-              border-radius: 50% 50% 50% 50%;
-            "
-          ></div>
+        <div style="width:100%;height:100%;background:#ffd700;border-radius:50%;position:relative">
+          <div style="position:absolute;width:33%;height:20%;background:#ffa500;right:-7%;top:40%;border-radius:50%"></div>
         </div>
       </div>
       <div id="score">0</div>
@@ -164,119 +87,70 @@
           <button id="endGameButton" class="game-button" onclick="endGame()">END GAME</button>
         </div>
       </div>
-      <div id="version">v1.0.3</div>
-      <div id="debug"></div>
     </div>
 
     <script>
-      const VERSION = '1.0.3';
-      const debug = document.getElementById("debug");
-      let debugVisible = false;
+      const bird = document.getElementById("bird"),
+            gameDiv = document.getElementById("game"),
+            scoreDiv = document.getElementById("score"),
+            gameOverDiv = document.getElementById("gameOver"),
+            finalScoreSpan = document.getElementById("finalScore"),
+            vw = Math.min(document.documentElement.clientWidth, 800),
+            vh = document.documentElement.clientHeight,
+            PIPE_WIDTH = Math.min(60, vw * 0.1),
+            PIPE_GAP = Math.min(200, vh * 0.3),
+            PIPE_SPACING = Math.min(300, vw * 0.4),
+            GAME_SPEED = Math.min(2, vw * 0.003),
+            BIRD_SIZE = Math.min(30, vw * 0.05),
+            BIRD_X = Math.min(80, vw * 0.2);
 
-      // Debug logging function
-      function log(message) {
-        const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-        const logMessage = `${timestamp}: ${message}`;
-        console.log(logMessage);
-        
-        if (debugVisible) {
-          debug.innerHTML += logMessage + '<br>';
-          debug.scrollTop = debug.scrollHeight;
-        }
-      }
+      let velocity = 0,
+          score = 0,
+          pipes = [],
+          isGameOver = false,
+          gameLoop,
+          birdPos = { x: BIRD_X, y: vh / 2 };
 
-      // Toggle debug view on triple click
-      document.addEventListener('click', (e) => {
-        if (e.detail === 3) {
-          debugVisible = !debugVisible;
-          debug.style.display = debugVisible ? 'block' : 'none';
-          if (debugVisible) {
-            log('Debug view enabled');
-            log(`TelegramGameProxy available: ${!!window.TelegramGameProxy}`);
-            if (window.TelegramGameProxy) {
-              log('Available TelegramGameProxy methods:');
-              for (let prop in window.TelegramGameProxy) {
-                log(`- ${prop}`);
-              }
-            }
-          }
-        }
-      });
+      // Get query parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const gameMessageId = urlParams.get('tgm') || null;
+      const chatInstance = urlParams.get('tgc') || null;
 
-      const bird = document.getElementById("bird");
-      const gameDiv = document.getElementById("game");
-      const scoreDiv = document.getElementById("score");
-      const gameOverDiv = document.getElementById("gameOver");
-      const finalScoreSpan = document.getElementById("finalScore");
-
-      // Game variables and constants remain the same
-      const vw = Math.min(document.documentElement.clientWidth, 800);
-      const vh = document.documentElement.clientHeight;
-
-      let velocity = 0;
-      let gravity = 0.4;
-      let jumpStrength = -7;
-      let score = 0;
-      let pipes = [];
-      let isGameOver = false;
-      let gameLoop;
-
-      const PIPE_WIDTH = Math.min(60, vw * 0.1);
-      const PIPE_GAP = Math.min(200, vh * 0.3);
-      const PIPE_SPACING = Math.min(300, vw * 0.4);
-      const GAME_SPEED = Math.min(2, vw * 0.003);
-      const BIRD_SIZE = Math.min(30, vw * 0.05);
-      const BIRD_X = Math.min(80, vw * 0.2);
-
-      const birdPos = {
-        x: BIRD_X,
-        y: vh / 2,
-      };
-
-      // Game functions remain the same until endGame
-      function endGame() {
-        log('End Game clicked');
-        try {
-          if (window.TelegramGameProxy) {
-            log('Posting score event: ' + score);
-            // Post the score to Telegram
-            window.TelegramGameProxy.postEvent('SCORE', score);
-            
-            // Small delay to ensure score is posted
-            setTimeout(() => {
-              log('Closing game');
-              window.TelegramGameProxy.close();
-            }, 100);
-          } else {
-            log('ERROR: TelegramGameProxy not available');
-            alert('Error: Game proxy not found. Are you running this in Telegram?');
-          }
-        } catch (error) {
-          log('ERROR in endGame: ' + error.message);
-          alert('Error ending game: ' + error.message);
-        }
-      }
-
-      // Rest of the game functions remain the same
       function createPipe() {
-        // ... (previous implementation)
+        const minTop = vh * 0.1,
+              maxTop = vh - PIPE_GAP - minTop,
+              topHeight = Math.random() * (maxTop - minTop) + minTop,
+              pipeContainer = document.createElement("div");
+        
+        pipeContainer.className = "pipe";
+        pipeContainer.style.cssText = `width:${PIPE_WIDTH}px;left:${vw}px`;
+        pipeContainer.innerHTML = `
+          <div style="position:absolute;width:100%;background:#4CAF50;top:0;height:${topHeight}px">
+            <div style="position:absolute;width:${PIPE_WIDTH + Math.min(10, vw * 0.015)}px;height:${Math.min(20, vh * 0.03)}px;background:#45a049;bottom:0;left:${-Math.min(5, vw * 0.008)}px"></div>
+          </div>
+          <div style="position:absolute;width:100%;background:#4CAF50;top:${topHeight + PIPE_GAP}px;bottom:0">
+            <div style="position:absolute;width:${PIPE_WIDTH + Math.min(10, vw * 0.015)}px;height:${Math.min(20, vh * 0.03)}px;background:#45a049;top:0;left:${-Math.min(5, vw * 0.008)}px"></div>
+          </div>`;
+        
+        gameDiv.appendChild(pipeContainer);
+        return { element: pipeContainer, x: vw, topHeight, bottomY: topHeight + PIPE_GAP, counted: false };
       }
 
       function checkCollision(pipe) {
-        // ... (previous implementation)
+        const birdRect = bird.getBoundingClientRect(),
+              pipeRect = pipe.element.getBoundingClientRect();
+        return birdRect.right > pipeRect.left && birdRect.left < pipeRect.right &&
+               (birdRect.top < pipe.topHeight || birdRect.bottom > pipe.bottomY);
       }
 
-      function gameOver() {
-        isGameOver = true;
-        clearInterval(gameLoop);
-        gameOverDiv.style.display = "block";
-        finalScoreSpan.textContent = score;
-        log('Game Over - Score: ' + score);
+      function endGame() {
+        if (window.TelegramGameProxy) {
+          window.TelegramGameProxy.close();
+        }
       }
 
       function resetGame() {
-        log('Resetting game');
-        pipes.forEach((pipe) => pipe.element.remove());
+        pipes.forEach(pipe => pipe.element.remove());
         pipes = [];
         score = 0;
         scoreDiv.textContent = "0";
@@ -286,21 +160,38 @@
         bird.style.transform = "translateY(-50%) rotate(0deg)";
         isGameOver = false;
         gameOverDiv.style.display = "none";
-
         pipes.push(createPipe());
         startGame();
       }
 
+      function sendScore(finalScore) {
+        if (window.TelegramGameProxy) {
+          const data = {
+            score: finalScore,
+            message_id: gameMessageId,
+            chat_instance: chatInstance,
+            edit_message: true,
+            force: false
+          };
+          window.TelegramGameProxy.shareScore(data);
+        }
+      }
+
+      function gameOver() {
+        isGameOver = true;
+        clearInterval(gameLoop);
+        gameOverDiv.style.display = "block";
+        finalScoreSpan.textContent = score;
+        sendScore(score);
+      }
+
       function updateGame() {
         if (isGameOver) return;
-
-        velocity += gravity;
+        
+        velocity += 0.4;
         birdPos.y += velocity;
         bird.style.top = birdPos.y + "px";
-        bird.style.transform = `translateY(-50%) rotate(${Math.min(
-          Math.max(velocity * 5, -20),
-          70
-        )}deg)`;
+        bird.style.transform = `translateY(-50%) rotate(${Math.min(Math.max(velocity * 5, -20), 70)}deg)`;
 
         if (birdPos.y - BIRD_SIZE / 2 < 0 || birdPos.y + BIRD_SIZE / 2 > vh) {
           gameOver();
@@ -328,53 +219,27 @@
           }
         });
 
-        if (
-          pipes.length === 0 ||
-          pipes[pipes.length - 1].x <= vw - PIPE_SPACING
-        ) {
+        if (pipes.length === 0 || pipes[pipes.length - 1].x <= vw - PIPE_SPACING) {
           pipes.push(createPipe());
         }
       }
 
-      function jump() {
-        if (!isGameOver) {
-          velocity = jumpStrength;
-        }
-      }
-
       function startGame() {
-        if (gameLoop) {
-          clearInterval(gameLoop);
-        }
+        if (gameLoop) clearInterval(gameLoop);
         gameLoop = setInterval(updateGame, 1000 / 60);
-        log('Game started');
       }
 
-      // Event listeners remain the same
-      gameDiv.addEventListener("click", (e) => {
-        if (!isGameOver || !gameOverDiv.contains(e.target)) {
-          jump();
+      function jump(e) {
+        if (!isGameOver && (!e || !gameOverDiv.contains(e.target))) {
+          velocity = -7;
         }
-        e.preventDefault();
-      });
+        e && e.preventDefault();
+      }
 
-      document.addEventListener("keydown", (e) => {
-        if (e.code === "Space") {
-          jump();
-          e.preventDefault();
-        }
-      });
+      gameDiv.addEventListener("click", jump);
+      document.addEventListener("keydown", e => e.code === "Space" && jump(e));
+      document.addEventListener("touchstart", jump);
 
-      document.addEventListener("touchstart", (e) => {
-        if (!isGameOver || !gameOverDiv.contains(e.target)) {
-          jump();
-        }
-        e.preventDefault();
-      });
-
-      // Initialize game
-      log('Game initialized');
-      log(`TelegramGameProxy available: ${!!window.TelegramGameProxy}`);
       pipes.push(createPipe());
       startGame();
     </script>

@@ -46,6 +46,17 @@
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         z-index: 1000;
       }
+      #highScore {
+        position: absolute;
+        top: min(100px, 15vh);
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: min(24px, 5vmin);
+        font-family: Arial;
+        color: gold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
       #gameOver {
         position: absolute;
         top: 50%;
@@ -88,6 +99,12 @@
       #shareButton {
         background: #2196f3;
       }
+      #newHighScore {
+        color: gold;
+        font-size: min(20px, 5vmin);
+        margin-top: 10px;
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -116,9 +133,11 @@
         </div>
       </div>
       <div id="score">0</div>
+      <div id="highScore">High Score: 0</div>
       <div id="gameOver">
         <h2>Game Over</h2>
         <p>Score: <span id="finalScore">0</span></p>
+        <p id="newHighScore">🏆 New High Score! 🏆</p>
         <div class="button-container">
           <button id="retryButton" class="game-button" onclick="resetGame()">
             RETRY
@@ -134,8 +153,10 @@
       const bird = document.getElementById("bird"),
         gameDiv = document.getElementById("game"),
         scoreDiv = document.getElementById("score"),
+        highScoreDiv = document.getElementById("highScore"),
         gameOverDiv = document.getElementById("gameOver"),
         finalScoreSpan = document.getElementById("finalScore"),
+        newHighScoreDiv = document.getElementById("newHighScore"),
         vw = Math.min(document.documentElement.clientWidth, 800),
         vh = document.documentElement.clientHeight,
         PIPE_WIDTH = Math.min(60, vw * 0.1),
@@ -147,6 +168,7 @@
 
       let velocity = 0,
         score = 0,
+        highScore = 0,
         pipes = [],
         isGameOver = false,
         gameLoop,
@@ -157,6 +179,8 @@
       const gameMessageId = urlParams.get("tgm") || null;
       const chatInstance = urlParams.get("tgc") || null;
       const isInline = urlParams.get("inline") === "1";
+      const userId = urlParams.get("uid") || null;
+      const username = urlParams.get("un") || null;
 
       function createPipe() {
         const minTop = vh * 0.1,
@@ -220,6 +244,7 @@
         bird.style.transform = "translateY(-50%) rotate(0deg)";
         isGameOver = false;
         gameOverDiv.style.display = "none";
+        newHighScoreDiv.style.display = "none";
         pipes.push(createPipe());
         startGame();
       }
@@ -229,6 +254,8 @@
         console.log('Game Message ID:', gameMessageId);
         console.log('Chat Instance:', chatInstance);
         console.log('Is Inline:', isInline);
+        console.log('User ID:', userId);
+        console.log('Username:', username);
         console.log('Score:', score);
 
         if (window.TelegramGameProxy) {
@@ -265,6 +292,12 @@
         clearInterval(gameLoop);
         gameOverDiv.style.display = "block";
         finalScoreSpan.textContent = score;
+        
+        if (score > highScore) {
+          highScore = score;
+          highScoreDiv.textContent = `High Score: ${highScore}`;
+          newHighScoreDiv.style.display = "block";
+        }
       }
 
       function updateGame() {

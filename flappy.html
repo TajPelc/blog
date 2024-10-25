@@ -224,6 +224,11 @@
       }
 
       function shareScore() {
+        console.log('Attempting to share score...');
+        console.log('Game Message ID:', gameMessageId);
+        console.log('Chat Instance:', chatInstance);
+        console.log('Score:', score);
+
         if (window.TelegramGameProxy) {
           const data = {
             score: score,
@@ -232,7 +237,17 @@
             edit_message: true,
             force: false,
           };
-          window.TelegramGameProxy.shareScore(data);
+          
+          console.log('Sending score data to Telegram:', data);
+          
+          try {
+            window.TelegramGameProxy.shareScore(data);
+            console.log('Score shared successfully');
+          } catch (error) {
+            console.error('Error sharing score:', error);
+          }
+        } else {
+          console.error('TelegramGameProxy not available');
         }
       }
 

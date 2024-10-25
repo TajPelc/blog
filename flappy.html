@@ -85,8 +85,8 @@
       #retryButton {
         background: #4caf50;
       }
-      #endGameButton {
-        background: #f44336;
+      #shareButton {
+        background: #2196f3;
       }
     </style>
   </head>
@@ -123,12 +123,8 @@
           <button id="retryButton" class="game-button" onclick="resetGame()">
             RETRY
           </button>
-          <button
-            id="endGameButton"
-            class="game-button"
-            onclick="window.close()"
-          >
-            END GAME
+          <button id="shareButton" class="game-button" onclick="shareScore()">
+            SHARE
           </button>
         </div>
       </div>
@@ -227,10 +223,10 @@
         startGame();
       }
 
-      function sendScore(finalScore) {
+      function shareScore() {
         if (window.TelegramGameProxy) {
           const data = {
-            score: finalScore,
+            score: score,
             message_id: gameMessageId,
             chat_instance: chatInstance,
             edit_message: true,
@@ -245,7 +241,6 @@
         clearInterval(gameLoop);
         gameOverDiv.style.display = "block";
         finalScoreSpan.textContent = score;
-        sendScore(score);
       }
 
       function updateGame() {

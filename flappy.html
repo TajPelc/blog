@@ -156,6 +156,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const gameMessageId = urlParams.get("tgm") || null;
       const chatInstance = urlParams.get("tgc") || null;
+      const isInline = urlParams.get("inline") === "1";
 
       function createPipe() {
         const minTop = vh * 0.1,
@@ -227,16 +228,22 @@
         console.log('Attempting to share score...');
         console.log('Game Message ID:', gameMessageId);
         console.log('Chat Instance:', chatInstance);
+        console.log('Is Inline:', isInline);
         console.log('Score:', score);
 
         if (window.TelegramGameProxy) {
           const data = {
             score: score,
-            message_id: gameMessageId,
-            chat_instance: chatInstance,
-            edit_message: true,
-            force: false,
+            force: false
           };
+
+          // Add appropriate message ID parameter based on game type
+          if (isInline) {
+            data.inline_message_id = gameMessageId;
+          } else {
+            data.message_id = gameMessageId;
+            data.edit_message = true;
+          }
           
           console.log('Sending score data to Telegram:', data);
           
@@ -245,6 +252,8 @@
             console.log('Score shared successfully');
           } catch (error) {
             console.error('Error sharing score:', error);
+            console.error('Error details:', error.message);
+            console.error('Error stack:', error.stack);
           }
         } else {
           console.error('TelegramGameProxy not available');

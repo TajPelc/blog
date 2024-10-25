@@ -168,7 +168,6 @@
 
       let velocity = 0,
         score = 0,
-        highScore = 0,
         pipes = [],
         isGameOver = false,
         gameLoop,
@@ -181,6 +180,10 @@
       const isInline = urlParams.get("inline") === "1";
       const userId = urlParams.get("uid") || null;
       const username = urlParams.get("un") || null;
+      const highScore = parseInt(urlParams.get("hs")) || 0;
+
+      // Initialize high score display
+      highScoreDiv.textContent = `High Score: ${highScore}`;
 
       function createPipe() {
         const minTop = vh * 0.1,
@@ -257,6 +260,7 @@
         console.log('User ID:', userId);
         console.log('Username:', username);
         console.log('Score:', score);
+        console.log('Current High Score:', highScore);
 
         if (window.TelegramGameProxy) {
           const data = {
@@ -294,9 +298,7 @@
         finalScoreSpan.textContent = score;
         
         if (score > highScore) {
-          highScore = score;
-          highScoreDiv.textContent = `High Score: ${highScore}`;
-          newHighScoreDiv.style.display = "block";
+            newHighScoreDiv.style.display = "block";
         }
       }
 

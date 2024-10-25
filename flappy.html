@@ -53,9 +53,9 @@
 
       #gameOver {
         position: absolute;
-        top: min(20px, 5vh);
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
         text-align: center;
         background: rgba(0, 0, 0, 0.9);
         padding: min(30px, 5vmin);
@@ -76,13 +76,30 @@
         font-size: min(18px, 4vmin);
       }
 
-      #gameOver button {
+      .button-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 15px;
+      }
+
+      .game-button {
         padding: min(10px, 2vmin) min(20px, 4vmin);
         font-size: min(16px, 4vmin);
         cursor: pointer;
-        background: white;
         border: none;
         border-radius: 5px;
+        min-width: 120px;
+      }
+
+      #retryButton {
+        background: #4CAF50;
+        color: white;
+      }
+
+      #endGameButton {
+        background: #f44336;
+        color: white;
       }
     </style>
   </head>
@@ -115,7 +132,10 @@
       <div id="gameOver">
         <h2>Game Over</h2>
         <p>Score: <span id="finalScore">0</span></p>
-        <button onclick="resetGame()">Play Again</button>
+        <div class="button-container">
+          <button id="retryButton" class="game-button" onclick="resetGame()">RETRY</button>
+          <button id="endGameButton" class="game-button" onclick="endGame()">END GAME</button>
+        </div>
       </div>
     </div>
 
@@ -235,14 +255,13 @@
         clearInterval(gameLoop);
         gameOverDiv.style.display = "block";
         finalScoreSpan.textContent = score;
+      }
 
-        // Post score to Telegram
+      function endGame() {
+        // Submit score to Telegram and close the game
         if (window.TelegramGameProxy) {
           TelegramGameProxy.setScore(score);
-          // Wait a moment for the score to be sent, then close the game
-          setTimeout(() => {
-            TelegramGameProxy.close();
-          }, 2000);
+          TelegramGameProxy.close();
         }
       }
 
@@ -322,7 +341,10 @@
 
       // Event listeners for all types of input
       gameDiv.addEventListener("click", (e) => {
-        jump();
+        // Only jump if click is not on the game over dialog
+        if (!isGameOver || !gameOverDiv.contains(e.target)) {
+          jump();
+        }
         e.preventDefault();
       });
 
@@ -334,7 +356,10 @@
       });
 
       document.addEventListener("touchstart", (e) => {
-        jump();
+        // Only jump if touch is not on the game over dialog
+        if (!isGameOver || !gameOverDiv.contains(e.target)) {
+          jump();
+        }
         e.preventDefault();
       });
 
